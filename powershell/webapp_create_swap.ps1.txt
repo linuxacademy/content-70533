@@ -1,0 +1,33 @@
+# Set variables
+$appName = "enter an app name here"
+$location = "southcentralus"
+$rgName = "enter a resource group name here"
+$sub = "enter your subscription name here"
+$gitRepo = "https://github.com/Azure-Samples/app-service-web-dotnet-get-started.git"
+
+# Log in to Azure
+Add-AzureRmAccount
+
+# Select subscription
+Set-AzureRmContext -SubscriptionName $sub
+
+# Create the resource group
+New-AzureRmResourceGroup -Name $rgName -Location $location
+
+# Create a Standard tier App Service Plan
+New-AzureRmAppServicePlan -Name $appName -Location $location -ResourceGroupName $rgName -Tier Standard
+
+# Create the Web App
+New-AzureRmWebApp -Name $appName -Location $location -AppServicePlan $appName -ResourceGroupName $rgName
+
+# Create a deployment slot with the name "staging".
+New-AzureRmWebAppSlot -Name $appName -ResourceGroupName $rgName -Slot staging
+
+# Configure GitHub deployment to the staging slot from your GitHub repo 
+$propertiesObject = @{ "RepoUrl" = "$gitRepo"; "Branch" = "master"; "IsManualIntegration" = "true"; }
+
+# Deploy that GitHub code to the staging slot
+Set-AzureRmResource -Properties $propertiesObject -ResourceGroupName $rgName -ResourceType "Microsoft.Web/sites/slots/sourcecontrols" -ResourceName "$appName/staging/web" -ApiVersion 2015-08-01 -Force
+
+# Swap the verified/warmed up staging slot into production.
+Swap-AzureRmWebAppSlot -Name $appName -ResourceGroupName $rgName -SourceSlotName staging -DestinationSlotName production

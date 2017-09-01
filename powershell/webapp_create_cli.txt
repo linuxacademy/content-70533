@@ -1,0 +1,11 @@
+azure login
+
+azure config mode arm
+
+azure account set "name of your account"
+
+azure group create --name "myresourcegroup" --location "East US"
+
+azure appserviceplan create --name "myappserviceplan" --location "East US" --resource-group "myresourcegroup" --sku S1 --instances 1
+
+azure webapp create --name "mywebapp" --resource-group "myresourcegroup" --plan "myappserviceplan" --location "East US"

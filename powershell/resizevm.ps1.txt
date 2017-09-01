@@ -1,0 +1,22 @@
+# Set variables
+$rgName = "scaleup-dougv"
+$subName = "LA_PAYGO_CONTENT1"
+$vmName = "scaleUpVM"
+
+# Log in to Azure
+Add-AzureRmAccount
+
+# Set subscription context
+Set-AzureRmContext -SubscriptionName $subName
+
+#Get all VM sizes available in this resource group
+Get-AzureRmVMSize -ResourceGroupName $rgname -VMName $vmName
+
+# Get a reference to the VM
+$vm = Get-AzureRmVM -ResourceGroupName $rgName -VMName $vmName
+
+# Set the VM size 
+$vm.HardwareProfile.VmSize = ""
+
+# Update the VM
+Update-AzureRmVM -VM $vm -ResourceGroupName $rgName
